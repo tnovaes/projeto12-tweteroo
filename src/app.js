@@ -16,8 +16,9 @@ app.post("/sign-up", (req, res) => {
         return res.status(400).send("Todos os campos são obrigatórios!");
     }
 
-    const newUser = { id: users.length++, username, avatar };
+    const newUser = { username, avatar };
     users.push(newUser);
+
     res.status(201).send("OK");
 
 })
@@ -30,15 +31,37 @@ app.post("/tweets", (req, res) => {
         return res.status(400).send("Todos os campos são obrigatórios!");
     }
 
-    const userAuthorized = users.some((user) => user.username === username);
+    const userAuthorized = users.find(user => user.username === username);
 
-    if(!userAuthorized){
+    if (!userAuthorized) {
         return res.status(401).send("UNAUTHORIZED");
     }
 
-    const newTweet = { id: tweets.length++, username, tweet };
+    const newTweet = { username, tweet };
     tweets.push(newTweet);
+
     res.status(201).send("OK");
+
+})
+
+app.get("/tweets", (req, res) => {
+
+    if (tweets.length === 0) {
+        return res.send([]);
+    }
+
+    const lastTweets = tweets.slice(-10);
+    const getTweets = lastTweets.map(
+        (t) => {
+            const user = users.find((u) => u.username === t.username);
+            return { 
+                username: user.username,
+                avatar: user.avatar,
+                tweet: t.tweet 
+            }
+        });
+
+    res.send(getTweets);
 
 })
 
